@@ -8,3 +8,7 @@ TodoMVC implemented in [svelte-draft](https://github.com/mistlog/svelte-draft), 
 > npm install
 > npm run dev
 ```
+
+## License
+
+This project is [MIT licensed](https://github.com/mistlog/svelte-draft-todo-mvc/blob/master/LICENSE).
