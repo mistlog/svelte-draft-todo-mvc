@@ -15,7 +15,7 @@ export default function Header(props: IHeaderProps)
     const dispatch = createEventDispatcher();
     const ENTER_KEY = 13;
 
-    function onAddTodo(event: Svelte.KeyboardEvent<HTMLInputElement>)
+    function onAddTodo(event: Svelte.KeyboardEvent<HTMLInputElement> & { target: { value: string } })
     {
         const todo = event.target.value.toString().trim();
 

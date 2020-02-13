@@ -1,36 +1,10 @@
-import Header, { IAddTodoInfo } from "./component/Header";
-import Filter from "./component/Filter";
+import Header, { IAddTodoInfo } from "./component/Header.svelte";
+import Filter from "./component/Filter.svelte";
 
 /**
  * 
  */
 export default function App()
-{
-    <State />;
-
-    <Action />;
-
-    //@ts-ignore
-    <Routing />;
-
-    //@ts-ignore
-    <UI />;
-}
-
-/**
- * state related
- */
-export interface ITodoItem
-{
-    id: string;
-    description: string;
-    completed: boolean;
-}
-
-export type TodoItems = Array<ITodoItem>;
-export type FilterName = "all" | "active" | "completed";
-
-function State()
 {
     //
     let items: TodoItems = JSON.parse(localStorage.getItem("todos-svelte")) || [];
@@ -39,11 +13,6 @@ function State()
     let editing: number;
     let currentFilter: FilterName = "all";
 
-    <Reactivity />;
-}
-
-function Reactivity()
-{
     // computed
     let filtered: TodoItems = [];
     let numActive: number;
@@ -51,45 +20,10 @@ function Reactivity()
 
     //@ts-ignore
     <TrackChange />;
-}
 
-function TrackChange(items: TodoItems, filtered: TodoItems, currentFilter: FilterName, numActive: number, numCompleted: number)
-{
-    "use watch";
-
-    filtered = currentFilter === "all" ? items :
-        currentFilter === "completed" ? items.filter(item => item.completed) :
-            items.filter(item => !item.completed);
-
-    numActive = items.filter(item => !item.completed).length;
-    numCompleted = items.filter(item => item.completed).length;
-    localStorage.setItem("todos-svelte", JSON.stringify(items));
-}
-
-/**
- * action related
- */
-
-function Action()
-{
     const ENTER_KEY = 13;
     const ESCAPE_KEY = 27;
 
-    //@ts-ignore
-    <AddTodo />;
-
-    //@ts-ignore
-    <RemoveTodo />;
-
-    //@ts-ignore
-    <EditTodo />;
-
-    //@ts-ignore
-    <Utility />;
-}
-
-function AddTodo(items: TodoItems, uuid: () => string, ENTER_KEY: number)
-{
     function addTodo(event: Svelte.KeyboardEvent<HTMLInputElement> & { detail: IAddTodoInfo })
     {
         items = items.concat({
@@ -98,19 +32,13 @@ function AddTodo(items: TodoItems, uuid: () => string, ENTER_KEY: number)
             completed: false
         });
     }
-}
 
-function RemoveTodo(items: TodoItems, index: number)
-{
     function remove(index: number)
     {
         items = items.slice(0, index).concat(items.slice(index + 1));
     }
-}
 
-function EditTodo(items: TodoItems, ENTER_KEY: number, ESCAPE_KEY: number, editing: number)
-{
-    function handleEdit(event: Svelte.KeyboardEvent<HTMLInputElement>)
+    function handleEdit(event: Svelte.KeyboardEvent<HTMLInputElement> & { target: { blur: () => void } })
     {
         if (event.which === ENTER_KEY) event.target.blur();
         else if (event.which === ESCAPE_KEY) editing = null;
@@ -121,10 +49,7 @@ function EditTodo(items: TodoItems, ENTER_KEY: number, ESCAPE_KEY: number, editi
         items[editing].description = event.target.value;
         editing = null;
     }
-}
 
-function Utility(items: TodoItems)
-{
     function uuid()
     {
         return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c)
@@ -148,14 +73,10 @@ function Utility(items: TodoItems)
             completed: event.target.checked
         }));
     }
-}
 
+    //@ts-ignore
+    <Routing />;
 
-/**
- * ui related
- */
-function UI(editing, remove, handleEdit, submit, addTodo, items, toggleAll, numCompleted, filtered, numActive, currentFilter, clearCompleted)
-{
     <section class="todoapp">
         <Header onAddTodo={addTodo} />
         <if condition={items.length > 0}>
@@ -214,6 +135,32 @@ function UI(editing, remove, handleEdit, submit, addTodo, items, toggleAll, numC
             </section>
         </if>
     </section>
+}
+
+/**
+ * state related
+ */
+export interface ITodoItem
+{
+    id: string;
+    description: string;
+    completed: boolean;
+}
+
+export type TodoItems = Array<ITodoItem>;
+export type FilterName = "all" | "active" | "completed";
+
+function TrackChange(items: TodoItems, filtered: TodoItems, currentFilter: FilterName, numActive: number, numCompleted: number)
+{
+    "use watch";
+
+    filtered = currentFilter === "all" ? items :
+        currentFilter === "completed" ? items.filter(item => item.completed) :
+            items.filter(item => !item.completed);
+
+    numActive = items.filter(item => !item.completed).length;
+    numCompleted = items.filter(item => item.completed).length;
+    localStorage.setItem("todos-svelte", JSON.stringify(items));
 }
 
 /**

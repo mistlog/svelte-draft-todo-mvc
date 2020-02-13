@@ -1,4 +1,4 @@
-import { FilterName } from "../App";
+import { FilterName } from "../App.svelte";
 
 export interface IFilterProps
 {
