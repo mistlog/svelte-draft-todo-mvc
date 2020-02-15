@@ -91,7 +91,7 @@ export default function App()
 
                 <ul class="todo-list">
                     <each from={filtered}>
-                        {(item, index, key = item.id) => (
+                        {(item: ITodoItem, index: number, key: string = item.id) => (
                             <li class={`${item.completed ? 'completed' : ''} ${editing === index ? 'editing' : ''}`}>
                                 <div class="view">
                                     <input

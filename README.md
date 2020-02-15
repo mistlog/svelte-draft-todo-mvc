@@ -6,12 +6,7 @@ TodoMVC implemented in [svelte-draft](https://github.com/mistlog/svelte-draft), 
 
 ```shell
 > npm install
-> npm run transcribe:watch
-```
-
-then, in another window:
-```shell
-> npx rollup -c -w
+> npm run dev
 ```
 
 ## License
