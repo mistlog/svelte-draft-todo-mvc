@@ -1,5 +1,5 @@
-import Header, { IAddTodoInfo } from "./component/Header.svelte";
-import Filter from "./component/Filter.svelte";
+import Header, { IAddTodoInfo } from "./component/Header";
+import Filter from "./component/Filter";
 
 /**
  * 
