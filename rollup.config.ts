@@ -4,11 +4,12 @@ import commonjs from '@rollup/plugin-commonjs';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import svelte_draft from 'rollup-plugin-svelte-draft';
+import { PatternMatch } from 'draft-dsl-match';
 
 const production = !process.env.ROLLUP_WATCH;
 
 export default {
-	input: 'src/main.js',
+	input: 'src/main.ts',
 	output: {
 		sourcemap: true,
 		format: 'iife',
@@ -16,16 +17,19 @@ export default {
 		file: 'public/build/bundle.js'
 	},
 	plugins: [
-		svelte_draft({ include: ["./src/**/*.tsx", "./src/**/*.ts"] }),
+		svelte_draft({
+			include: ["./src/**/*.tsx", "./src/**/*.ts"], config: {
+				DSLs: [{ name: "match", dsl: () => new PatternMatch(true) }]
+			}
+		}),
 		svelte({
-			extensions: [".tsx",".svelte"],
+			extensions: [".tsx", ".svelte"],
 			exclude: "./src/**/*.js.tsx",
 			// enable run-time checks when not in production
 			dev: !production,
 			// we'll extract any component CSS out into
 			// a separate file — better for performance
-			css: css =>
-			{
+			css: css => {
 				css.write('public/build/bundle.css');
 			}
 		}),
@@ -58,15 +62,12 @@ export default {
 	}
 };
 
-function serve()
-{
+function serve() {
 	let started = false;
 
 	return {
-		writeBundle()
-		{
-			if (!started)
-			{
+		writeBundle() {
+			if (!started) {
 				started = true;
 
 				require('child_process').spawn('npm', ['run', 'start', '--', '--dev'], {

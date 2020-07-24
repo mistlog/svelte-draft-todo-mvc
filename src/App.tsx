@@ -1,12 +1,7 @@
 import Header, { IAddTodoInfo } from "./component/Header";
 import Filter from "./component/Filter";
 
-/**
- * 
- */
-export default function App()
-{
-    //
+export default function App() {
     let items: TodoItems = JSON.parse(localStorage.getItem("todos-svelte")) || [];
 
     // current editing item
@@ -18,64 +13,20 @@ export default function App()
     let numActive: number;
     let numCompleted: number;
 
-    //@ts-ignore
-    <TrackChange />;
-
-    const ENTER_KEY = 13;
-    const ESCAPE_KEY = 27;
-
-    function addTodo(event: Svelte.KeyboardEvent<HTMLInputElement> & { detail: IAddTodoInfo })
     {
-        items = items.concat({
-            id: uuid(),
-            description: event.detail.value,
-            completed: false
-        });
-    }
+        "use watch";
 
-    function remove(index: number)
-    {
-        items = items.slice(0, index).concat(items.slice(index + 1));
-    }
-
-    function handleEdit(event: Svelte.KeyboardEvent<HTMLInputElement> & { target: { blur: () => void } })
-    {
-        if (event.which === ENTER_KEY) event.target.blur();
-        else if (event.which === ESCAPE_KEY) editing = null;
-    }
-
-    function submit(event: Svelte.FocusEvent<HTMLInputElement>)
-    {
-        items[editing].description = event.target.value;
-        editing = null;
-    }
-
-    function uuid()
-    {
-        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c)
         {
-            var r = (Math.random() * 16) | 0,
-                v = c == "x" ? r : (r & 0x3) | 0x8;
-            return v.toString(16);
-        });
-    }
+            "use match";
+            (currentFilter: "all") => filtered = items;
+            (currentFilter: "completed") => filtered = items.filter(item => item.completed);
+            () => filtered = items.filter(item => !item.completed);
+        }
 
-    function clearCompleted()
-    {
-        items = items.filter(item => !item.completed);
-    }
-
-    function toggleAll(event: Svelte.ChangeEvent<HTMLInputElement>)
-    {
-        items = items.map(item => ({
-            id: item.id,
-            description: item.description,
-            completed: event.target.checked
-        }));
-    }
-
-    //@ts-ignore
-    <Routing />;
+        numActive = items.filter(item => !item.completed).length;
+        numCompleted = items.filter(item => item.completed).length;
+        localStorage.setItem("todos-svelte", JSON.stringify(items));
+    };
 
     <section class="todoapp">
         <Header onAddTodo={addTodo} />
@@ -135,13 +86,60 @@ export default function App()
             </section>
         </if>
     </section>
+
+    const ENTER_KEY = 13;
+    const ESCAPE_KEY = 27;
+
+    function addTodo(event: Svelte.KeyboardEvent<HTMLInputElement> & { detail: IAddTodoInfo }) {
+        items = items.concat({
+            id: uuid(),
+            description: event.detail.value,
+            completed: false
+        });
+    }
+
+    function remove(index: number) {
+        items = items.slice(0, index).concat(items.slice(index + 1));
+    }
+
+    function handleEdit(event: Svelte.KeyboardEvent<HTMLInputElement> & { target: { blur: () => void } }) {
+        if (event.which === ENTER_KEY) event.target.blur();
+        else if (event.which === ESCAPE_KEY) editing = null;
+    }
+
+    function submit(event: Svelte.FocusEvent<HTMLInputElement>) {
+        items[editing].description = event.target.value;
+        editing = null;
+    }
+
+    function uuid() {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+            var r = (Math.random() * 16) | 0,
+                v = c == "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    function clearCompleted() {
+        items = items.filter(item => !item.completed);
+    }
+
+    function toggleAll(event: Svelte.ChangeEvent<HTMLInputElement>) {
+        items = items.map(item => ({
+            id: item.id,
+            description: item.description,
+            completed: event.target.checked
+        }));
+    }
+
+    //@ts-ignore
+    <Routing />;
 }
 
 /**
  * state related
  */
-export interface ITodoItem
-{
+export interface ITodoItem {
     id: string;
     description: string;
     completed: boolean;
@@ -150,32 +148,15 @@ export interface ITodoItem
 export type TodoItems = Array<ITodoItem>;
 export type FilterName = "all" | "active" | "completed";
 
-function TrackChange(items: TodoItems, filtered: TodoItems, currentFilter: FilterName, numActive: number, numCompleted: number)
-{
-    "use watch";
-
-    filtered = currentFilter === "all" ? items :
-        currentFilter === "completed" ? items.filter(item => item.completed) :
-            items.filter(item => !item.completed);
-
-    numActive = items.filter(item => !item.completed).length;
-    numCompleted = items.filter(item => item.completed).length;
-    localStorage.setItem("todos-svelte", JSON.stringify(items));
-}
-
 /**
  * routing related
  */
-function Routing(currentFilter: FilterName)
-{
-    window.addEventListener("hashchange", () =>
-    {
+function Routing(currentFilter: FilterName) {
+    window.addEventListener("hashchange", () => {
         currentFilter = "all";
-        if (window.location.hash === "#/active")
-        {
+        if (window.location.hash === "#/active") {
             currentFilter = "active";
-        } else if (window.location.hash === "#/completed")
-        {
+        } else if (window.location.hash === "#/completed") {
             currentFilter = "completed";
         }
     });
